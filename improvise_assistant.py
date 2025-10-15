@@ -4,6 +4,7 @@ import threading
 import time
 
 TEMPO = 140
+CURRENT_MEASURE = 1
 
 NOTES = {
 	"whole": 1.0,
@@ -34,28 +35,17 @@ pygame.init()
 screen = pygame.display.set_mode((300, 300))
 pygame.display.set_caption("Improvise Assistant")
 
+font = pygame.font.SysFont(None, 100)
+text = font.render(str(CURRENT_MEASURE), True, (255, 255, 255))
+text_rect = text.get_rect(center=(300 // 2, 300 // 2))
+
 def note_duration_seconds(length_fraction):
 	seconds_per_beat = 60 / TEMPO
 	return length_fraction * 4 * seconds_per_beat
 
-def play_notes(notes: list, bank: int = 0, preset: int = 0):
-	synth = fluidsynth.Synth()
-	synth.start()
-
-	sfid = synth.sfload("assets/ms-basic.sf2")
-	synth.program_select(0, sfid, bank, preset)
-
-	for note, length_fraction in notes:
-		note = MIDI_NAMES[note]
-		length_fraction = NOTES[length_fraction]
-		note_duration = note_duration_seconds(length_fraction)
-		synth.noteon(0, note, 100)
-		time.sleep(note_duration)
-		synth.noteoff(0, note)
-	
-	synth.delete()
-
 def play_song(song_dict: dict):
+	global CURRENT_MEASURE
+	
 	synth = fluidsynth.Synth()
 	synth.start()
 
@@ -70,7 +60,7 @@ def play_song(song_dict: dict):
 		
 		synth.program_select(channel, sfid, bank, preset) # type: ignore
 		
-		for measure in measures:
+		for midx, measure in enumerate(measures):
 			for note_name, note_length in measure:
 				note_name = MIDI_NAMES[note_name]
 				note_length = NOTES[note_length]
@@ -78,13 +68,16 @@ def play_song(song_dict: dict):
 				synth.noteon(channel, note_name, 100) # type: ignore
 				time.sleep(note_dur)
 				synth.noteoff(channel, note_name) # type: ignore
+			CURRENT_MEASURE = midx + 1
+			text = font.render(str(CURRENT_MEASURE + 1), True, (255, 255, 255))
+			text_rect = text.get_rect(center=(300 // 2, 300 // 2))
 		
 	synth.delete()
 
 formula_song = {
 	"piano": [
 		[("C3", "quarter-dotted"), ("D#3", "eighth"), ("G3", "half")],
-		[("G2", "quarter-dotted"), ("A#2", "eighth"), ("F3", "half")]
+		[("G2", "quarter-dotted"), ("A#2", "eighth"), ("F3", "quarter-dotted"), ("G3", "eighth")]
 	]
 }
 
@@ -97,6 +90,7 @@ while running:
 			running = False
 	
 	screen.fill((50, 50, 50))
+	screen.blit(text, text_rect)
 	pygame.display.flip()
 
 pygame.quit()
