@@ -1,3 +1,7 @@
+import os
+
+os.add_dll_directory(r"C:\Users\circ8\Documents\Chris\fluidsynth-v2.5.0-win10-x64-cpp11\bin")
+
 import fluidsynth
 import pygame
 import threading
@@ -136,22 +140,35 @@ formula_song = {
 		[("F2", "quarter-dotted"), ("C3", "eighth"), ("D#3", "quarter-dotted"), ("D3", "eighth")]
 	],
 	"piano2": [
-		[("R", "eighth"), (["C4", "D#4", "G4", "A#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["A#3", "D4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "G4", "A#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["A#3", "D4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "G4", "A#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "G4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "G4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "G4", "A#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["A#3", "D4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
-		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")]
+		[("R", "eighth"), (["C5", "D#5", "G5", "A#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["A#4", "D5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "G5", "A#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["A#4", "D5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "G5", "A#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "G5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "G5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "G5", "A#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["A#4", "D5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "F5", "G#5"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C5", "D#5", "F5", "G#5"], "half-dotted-eighth-tie")]
+	],
+	"harp": [
+		[("R", "quarter"), (["C6", "A#6"], "eighth"), (["C6", "A#6"], "eighth"), ("R", "quarter"), (["C6", "A#6"], "eighth"), ("R", "eighth")],
+		[(["G5", "F6"], "quarter-dotted"), ("R", "quarter-dotted"), (["G5", "F6"], "eighth"), (["G5", "F6"], "eighth")],
+		[(["F5", "D#6"], "eighth"), ("R", "eighth"), (["F5", "D#6"], "eighth"), ("R", "quarter"), (["F5", "D#6"], "eighth"), ("R", "quarter")],
+		[(["F5", "D#6"], "eighth"), (["F5", "D#6"], "eighth"), ("R", "half-dotted")],
+		[("R", "quarter"), (["C6", "A#6"], "eighth"), (["C6", "A#6"], "eighth"), ("R", "quarter"), (["C6", "A#6"], "eighth"), ("R", "eighth")],
+		[(["G5", "F6"], "quarter-dotted"), ("R", "quarter-dotted"), (["G5", "F6"], "eighth"), (["G5", "F6"], "eighth")],
+		[(["F5", "D#6"], "eighth"), ("R", "eighth"), (["F5", "D#6"], "eighth"), ("R", "quarter"), (["F5", "D#6"], "eighth"), ("R", "quarter")],
+		[(["F5", "D#6"], "eighth"), (["F5", "D#6"], "eighth"), ("R", "half-dotted")],
+		[(["C6", "A#6"], "eighth"), ("R", "eighth"), (["C6", "A#6"], "eighth"), ("R", "quarter"), (["C6", "A#6"], "eighth"), ("R", "quarter")],
+		[("R", "eighth"), (["F5", "D#6"], "eighth"), ("R", "quarter"), (["F5", "D#6"], "quarter-dotted"), ("R", "eighth")],
+		[(["G#5", "G6"], "eighth"), ]
 	]
 }
 
