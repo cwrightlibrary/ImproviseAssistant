@@ -8,6 +8,7 @@ CURRENT_MEASURE = 1
 
 NOTES = {
 	"whole": 1.0,
+	"half-dotted-eighth-tie": 0.875,
 	"half-dotted": 0.75,
 	"half": 0.5,
 	"quarter-dotted": 0.375,
@@ -26,6 +27,16 @@ def create_midi_note_dict() -> dict:
 			midi_num = (octave + 1) * 12 + i
 			note_name = f"{note}{octave + 1}"
 			note_dict[note_name] = midi_num
+			if note == "C#":
+				note_dict["Db"] = midi_num
+			elif note == "D#":
+				note_dict["Eb"] = midi_num
+			elif note == "F#":
+				note_dict["Gb"] = midi_num
+			elif note == "G#":
+				note_dict["Ab"] = midi_num
+			elif note == "A#":
+				note_dict["Bb"] = midi_num
 
 	return note_dict
 
@@ -43,41 +54,104 @@ def note_duration_seconds(length_fraction):
 	seconds_per_beat = 60 / TEMPO
 	return length_fraction * 4 * seconds_per_beat
 
-def play_song(song_dict: dict):
-	global CURRENT_MEASURE
+def play_instrument(instrument, measures, sfid, synth):
+	if instrument == "harp":
+		bank = 0; preset = 46; channel = 0
+	elif instrument == "piano":
+		bank = 0; preset = 0; channel = 1
+	elif instrument == "piano2":
+		bank = 0; preset = 0; channel = 3
+	elif instrument == "drums":
+		bank = 128; preset = 32; channel = 2
+	else:
+		return
 	
+	synth.program_select(channel, sfid, bank, preset)
+
+	global CURRENT_MEASURE, text, text_rect
+	for midx, measure in enumerate(measures):
+		for note_name, note_len in measure:
+			velocity = 100
+
+			if isinstance(note_name, str) and note_name.lower() == "r":
+				note_name = "C3"
+				velocity = 0
+			
+			if isinstance(note_name, list):
+				note_name = [MIDI_NAMES[n] for n in note_name]
+			else:
+				note_name = MIDI_NAMES[note_name]
+			
+			note_len = NOTES[note_len]
+			note_dur = note_duration_seconds(note_len)
+
+			if isinstance(note_name, list):
+				for n in note_name:
+					synth.noteon(channel, n, velocity)
+				time.sleep(note_dur)
+				for n in note_name:
+					synth.noteoff(channel, n)
+			else:
+				synth.noteon(channel, note_name, velocity)
+				time.sleep(note_dur)
+				synth.noteoff(channel, note_name)
+		
+		CURRENT_MEASURE = midx + 1
+		text = font.render(str(CURRENT_MEASURE + 1), True, (255, 255, 255))
+		text_rect = text.get_rect(center=(300 // 2, 300 // 2))
+
+def play_song(song_dict: dict):
 	synth = fluidsynth.Synth()
 	synth.start()
-
 	sfid = synth.sfload("assets/ms-basic.sf2")
+
+	threads = []
 	for instrument, measures in song_dict.items():
-		if instrument == "harp":
-			bank = 0; preset = 46; channel = 0
-		elif instrument == "piano":
-			bank = 0; preset = 0; channel = 1
-		elif instrument == "drums":
-			bank = 128; preset = 32; channel = 2
-		
-		synth.program_select(channel, sfid, bank, preset) # type: ignore
-		
-		for midx, measure in enumerate(measures):
-			for note_name, note_length in measure:
-				note_name = MIDI_NAMES[note_name]
-				note_length = NOTES[note_length]
-				note_dur = note_duration_seconds(note_length)
-				synth.noteon(channel, note_name, 100) # type: ignore
-				time.sleep(note_dur)
-				synth.noteoff(channel, note_name) # type: ignore
-			CURRENT_MEASURE = midx + 1
-			text = font.render(str(CURRENT_MEASURE + 1), True, (255, 255, 255))
-			text_rect = text.get_rect(center=(300 // 2, 300 // 2))
-		
+		t = threading.Thread(target=play_instrument, args=(instrument, measures, sfid, synth))
+		t.start()
+		threads.append(t)
+	
+	for t in threads:
+		t.join()
+	
 	synth.delete()
 
 formula_song = {
 	"piano": [
 		[("C3", "quarter-dotted"), ("D#3", "eighth"), ("G3", "half")],
-		[("G2", "quarter-dotted"), ("A#2", "eighth"), ("F3", "quarter-dotted"), ("G3", "eighth")]
+		[("G2", "quarter-dotted"), ("A#2", "eighth"), ("F3", "quarter-dotted"), ("G2", "eighth")],
+		[("F2", "quarter-dotted"), ("C3", "eighth"), ("D#3", "half")],
+		[("F2", "quarter-dotted"), ("C3", "eighth"), ("D#3", "quarter-dotted"), ("D3", "eighth")],
+		[("C3", "quarter-dotted"), ("D#3", "eighth"), ("G3", "half")],
+		[("G2", "quarter-dotted"), ("A#2", "eighth"), ("F3", "quarter-dotted"), ("G2", "eighth")],
+		[("F2", "quarter-dotted"), ("C3", "eighth"), ("D#3", "half")],
+		[("F2", "quarter-dotted"), ("C3", "eighth"), ("D#3", "quarter-dotted"), ("D3", "eighth")],
+		[("C3", "quarter-dotted"), ("D#3", "eighth"), ("G3", "half")],
+		[("F2", "quarter-dotted"), ("C3", "eighth"), ("D#3", "quarter-dotted"), ("D3", "eighth")],
+		[("G#2", "quarter-dotted"), ("C3", "eighth"), ("G3", "half")],
+		[("G#2", "quarter-dotted"), ("C3", "eighth"), ("G3", "quarter-dotted"), ("D#3", "eighth")],
+		[("C3", "quarter-dotted"), ("D#3", "eighth"), ("G3", "half")],
+		[("G2", "quarter-dotted"), ("A#2", "eighth"), ("F3", "quarter-dotted"), ("G2", "eighth")],
+		[("F2", "quarter-dotted"), ("C3", "eighth"), ("D#3", "half")],
+		[("F2", "quarter-dotted"), ("C3", "eighth"), ("D#3", "quarter-dotted"), ("D3", "eighth")]
+	],
+	"piano2": [
+		[("R", "eighth"), (["C4", "D#4", "G4", "A#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["A#3", "D4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "G4", "A#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["A#3", "D4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "G4", "A#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "G4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "G4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "G4", "A#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["A#3", "D4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")],
+		[("R", "eighth"), (["C4", "D#4", "F4", "G#4"], "half-dotted-eighth-tie")]
 	]
 }
 
